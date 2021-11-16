@@ -1,0 +1,38 @@
+{
+  "private": true,
+  "name": "remix-app-template",
+  "description": "",
+  "license": "",
+  "scripts": {
+    "build": "remix build",
+    "dev": "remix watch",
+    "postinstall": "remix setup cloudflare-workers",
+    "build:worker": "esbuild --define:process.env.NODE_ENV='\"production\"' --platform=node --bundle --sourcemap --outdir=dist ./worker",
+    "dev:worker": "esbuild --define:process.env.NODE_ENV='\"development\"' --platform=node --bundle --sourcemap --outdir=dist ./worker",
+    "start": "miniflare --build-command \"npm run dev:worker\" --watch",
+    "deploy": "npm run build && wrangler publish"
+  },
+  "dependencies": {
+    "@aws-sdk/client-apigatewayv2": "^3.41.0",
+    "@remix-run/cloudflare-workers": "^0.20.1",
+    "@remix-run/react": "^0.20.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router-dom": "6.0.0-beta.8",
+    "remix": "^0.20.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^2.2.2",
+    "@remix-run/dev": "^0.20.1",
+    "@types/react": "^17.0.24",
+    "@types/react-dom": "^17.0.9",
+    "esbuild": "^0.13.0",
+    "miniflare": "^1.4.1",
+    "typescript": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "sideEffects": false,
+  "main": "dist/worker.js"
+}
