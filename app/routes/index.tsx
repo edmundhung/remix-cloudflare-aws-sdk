@@ -1,8 +1,6 @@
 import type { MetaFunction, LinksFunction, LoaderFunction } from "remix";
 import { useLoaderData } from "remix";
 import stylesUrl from "../styles/index.css";
-import type { Api } from "@aws-sdk/client-apigatewayv2";
-import { ApiGatewayV2Client, GetApisCommand } from "@aws-sdk/client-apigatewayv2";
 
 export let meta: MetaFunction = () => {
 	return {
@@ -21,15 +19,14 @@ export let links: LinksFunction = () => {
 	];
 };
 
-export let loader: LoaderFunction = async () => {
-	const client = new ApiGatewayV2Client({ region: "us-east-1" });
-	const command = new GetApisCommand({ MaxResults: "1000" });
-	const response = await client.send(command);
-	return { apis: response.Items ?? [] };
+export let loader: LoaderFunction = async ({ context }) => {
+	return {
+		apis: await context.request(),
+	};
 };
 
 export default function Index() {
-	let data = useLoaderData<{ apis: Api[] }>();
+	let data = useLoaderData();
 
 	return (
 		<div style={{ textAlign: "center", padding: 20 }}>
