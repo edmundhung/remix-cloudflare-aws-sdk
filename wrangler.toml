@@ -1,5 +1,5 @@
 name = "remix-cloudflare-workers"
-type = "javascript"
+type = "webpack"
 
 zone_id = ""
 account_id = ""

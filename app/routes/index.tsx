@@ -1,40 +1,48 @@
 import type { MetaFunction, LinksFunction, LoaderFunction } from "remix";
 import { useLoaderData } from "remix";
-import { ApiGatewayV2Client } from "@aws-sdk/client-apigatewayv2";
-import { Link } from "react-router-dom";
 import stylesUrl from "../styles/index.css";
+import type { Api } from "@aws-sdk/client-apigatewayv2";
+import { ApiGatewayV2Client, GetApisCommand } from "@aws-sdk/client-apigatewayv2";
 
 export let meta: MetaFunction = () => {
-    return {
-        title: "Remix Starter",
-        description: "Welcome to remix!",
-    };
+	return {
+		title: "Remix Starter",
+		description: "Welcome to remix!",
+	};
 };
 
 export let links: LinksFunction = () => {
-    return [{ rel: "stylesheet", href: stylesUrl }];
+	return [
+		{ rel: "stylesheet", href: stylesUrl },
+		{
+			href: "https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css",
+			rel: "stylesheet",
+		},
+	];
 };
 
 export let loader: LoaderFunction = async () => {
-    const client = new ApiGatewayV2Client({ region: "us-east-1" });
-    return { message: "this is awesome 😎" };
+	const client = new ApiGatewayV2Client({ region: "us-east-1" });
+	const command = new GetApisCommand({ MaxResults: "1000" });
+	const response = await client.send(command);
+	return { apis: response.Items ?? [] };
 };
 
 export default function Index() {
-    let data = useLoaderData();
+	let data = useLoaderData<{ apis: Api[] }>();
 
-    return (
-        <div style={{ textAlign: "center", padding: 20 }}>
-            <h2>Welcome to Remix!</h2>
-            <p>
-                <a href="https://docs.remix.run">Check out the docs</a> to get
-                started.
-            </p>
-            <p>Message from the loader: {data.message}</p>
-            <p>
-                <Link to="not-found">Link to 404 not found page.</Link> Clicking
-                this link will land you in your root CatchBoundary component.
-            </p>
-        </div>
-    );
+	return (
+		<div style={{ textAlign: "center", padding: 20 }}>
+			<h2 className="text-xl font-bold">API Environments</h2>
+			<div>
+				{data.apis.map((api) => {
+					return (
+						<div className="mb-1" key={api.Name}>
+							{api.Name}
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	);
 }
